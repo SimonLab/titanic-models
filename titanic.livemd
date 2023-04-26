@@ -5,53 +5,9 @@
 ```elixir
 Mix.install([
   {:explorer, "~> 0.5.6"},
-  {:kino_explorer, "~> 0.1.4"}
+  {:kino_explorer, "~> 0.1.4"},
+  {:scholar, "~> 0.1.0"}
 ])
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-Resolving Hex dependencies...
-Resolution completed in 0.132s
-New:
-  castore 1.0.1
-  explorer 0.5.6
-  kino 0.9.2
-  kino_explorer 0.1.4
-  rustler_precompiled 0.6.1
-  table 0.1.2
-  table_rex 3.1.1
-* Getting explorer (Hex package)
-* Getting kino_explorer (Hex package)
-* Getting kino (Hex package)
-* Getting table (Hex package)
-* Getting rustler_precompiled (Hex package)
-* Getting table_rex (Hex package)
-* Getting castore (Hex package)
-==> table
-Compiling 5 files (.ex)
-Generated table app
-==> kino
-Compiling 39 files (.ex)
-Generated kino app
-==> table_rex
-Compiling 7 files (.ex)
-Generated table_rex app
-==> castore
-Compiling 1 file (.ex)
-Generated castore app
-==> rustler_precompiled
-Compiling 4 files (.ex)
-Generated rustler_precompiled app
-==> explorer
-Compiling 19 files (.ex)
-
-12:25:31.457 [debug] Copying NIF from cache and extracting to /home/simon/.cache/mix/installs/elixir-1.14.4-erts-13.1.1/fd8c1f84a32925a800ff4d0bb93db7d1/_build/dev/lib/explorer/priv/native/libexplorer-v0.5.6-nif-2.16-x86_64-unknown-linux-gnu.so
-Generated explorer app
-==> kino_explorer
-Compiling 4 files (.ex)
-Generated kino_explorer app
 ```
 
 <!-- livebook:{"output":true} -->
@@ -106,4 +62,39 @@ df =
   df
   |> DF.put("Sex", sex)
   |> DF.put("Embarked", embarked)
+```
+
+```elixir
+# Logistic Regression using Scholar: https://hexdocs.pm/scholar/Scholar.Linear.LogisticRegression.html
+
+y = df["Survived"] |> Explorer.Series.to_tensor()
+
+x =
+  df
+  |> DF.discard("Survived")
+  |> Nx.stack(axis: 1)
+
+# |> Explorer.DataFrame.to_series()
+# |> Enum.map(fn {_name, s} -> Explorer.Series.to_tensor(s) end)
+
+# y
+model = Scholar.Linear.LogisticRegression.fit(x, y, num_classes: 2)
+
+Scholar.Linear.LogisticRegression.predict(
+  model,
+  Nx.tensor([[3.0, 1.0, 22.0, 1.0, 0.0, 7.25, 0.0], [3.0, 1.0, 22.0, 1.0, 0.0, 7.25, 0.0]])
+)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+#Nx.Tensor<
+  s64[2]
+  [0, 0]
+>
+```
+
+```elixir
+
 ```
